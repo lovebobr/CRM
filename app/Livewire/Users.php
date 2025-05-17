@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use WithPagination;
+use Spatie\Permission\Models\Role;
 class Users extends Component
 {
     protected array $rules=[
@@ -22,12 +23,53 @@ class Users extends Component
 
 
     ];
+
     public $name, $email;
-    public $perPage = 10;
+    public $perPage = 5;
     public $userForUpdate=null;
     public $orderDirection='asc';
     public $orderBy='name';
     public $searchTerm="";
+    public $showRoleAssignment = false;
+    public $selectedUserRoles = [];
+    public $userForRoleAssignment = null;
+    public $availableRoles;
+
+    public function mount()
+    {
+        $this->availableRoles = Role::all();
+        // ... остальной mount код ...
+    }
+
+    public function assignRoles($userId)
+    {
+        $this->userForRoleAssignment = User::findOrFail($userId);
+        $this->selectedUserRoles = $this->userForRoleAssignment->roles->pluck('name')->toArray(); // Используем name вместо id
+        $this->showRoleAssignment = true;
+    }
+    public function updateUserRoles()
+    {
+        // Проверяем, что пользователь выбран
+        if (!$this->userForRoleAssignment) {
+            session()->flash('error', 'Пользователь не выбран!');
+            return;
+        }
+
+        // Проверяем, что выбраны роли
+        if (empty($this->selectedUserRoles)) {
+            session()->flash('error', 'Выберите хотя бы одну роль!');
+            return;
+        }
+
+        // Обновляем роли (syncRoles принимает массив имён, например ['admin', 'manager'])
+        $this->userForRoleAssignment->syncRoles($this->selectedUserRoles);
+
+        // Закрываем модальное окно и обновляем данные
+        $this->showRoleAssignment = false;
+        $this->dispatch('userRolesUpdated');
+        session()->flash('success', 'Роли успешно обновлены!');
+    }
+
     public function deleteUser($id){
         $user=User::query()->find($id);
         $user->delete();

@@ -36,6 +36,11 @@ new class extends Component
                     <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
                         {{ __('Users') }}
                     </x-nav-link>
+                    @if(auth()->user()->hasRole('admin'))
+                    <x-nav-link :href="route('managers')" :active="request()->routeIs('managers')" wire:navigate>
+                        {{ __('ManagersTab') }}
+                    </x-nav-link>
+                    @endif
                 </div>
 {{--                </div>--}}
             </div>

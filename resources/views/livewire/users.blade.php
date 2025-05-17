@@ -72,8 +72,8 @@
                         <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
                             <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Действия</p>
                         </th>
-                        <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70"></p>
+                        <th class="border-y border-blue-gray-200 bg-blue-gray-50/50 p-4">
+                            <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Роль</p>
                         </th>
                     </tr>
                     </thead>
@@ -103,6 +103,14 @@
                                   </svg>
                                 </span>
                             </button>
+                            <button wire:click="assignRoles({{ $user->id }})"
+                                    class="relative align-middle select-none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-900 hover:bg-gray-900/10 active:bg-gray-900/20" type="button">
+                                    <span class="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
+                                    <svg  width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </svg>
+                                    </span>
+                            </button>
                             @if($user->deleted_at)
                                 <button wire:click="restoreUser({{$user->id}})"
                                         class="relative align-middle select-none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-900 hover:bg-gray-900/10 active:bg-gray-900/20" type="button">
@@ -120,7 +128,57 @@
                             @endif
 
                         </td>
+                        <td class="p-4 border-b border-blue-gray-50">
+                                @forelse($user->roles as $role)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ $role->name }}</span>
+                                @empty
+                                    <span class="text-gray-500">—</span>
+                                @endforelse
+                        </td>
                     </tr>
+
+                        <!-- Модальное окно для назначения ролей -->
+                        @if($showRoleAssignment)
+                            <div class="fixed inset-0 z-50 overflow-y-auto">
+                                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                                        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                    </div>
+
+                                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                                Роли для {{ $userForRoleAssignment->name }}
+                                            </h3>
+
+                                            <div class="space-y-2">
+                                                @foreach($availableRoles as $role)
+                                                    <div class="flex items-center">
+                                                        <input wire:model="selectedUserRoles" value="{{ $role->id }}"
+                                                               type="checkbox" id="user-role-{{ $role->id }}"
+                                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                        <label for="user-role-{{ $role->id }}" class="ml-2 block text-sm text-gray-700">
+                                                            {{ $role->name }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                            <button wire:click="updateUserRoles" type="button"
+                                                    class="text-white bg-pink-300 hover:bg-pink-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                                                Сохранить
+                                            </button>
+                                            <button wire:click="$set('showRoleAssignment', false)" type="button"
+                                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                Отмена
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @empty
                         <p>Ничего не найдено</p>
                     @endforelse

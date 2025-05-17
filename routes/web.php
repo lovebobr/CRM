@@ -31,4 +31,5 @@ Route::get('hello/{name}',function($name){
 Route::get('users', \App\Livewire\Users::class)->name('users');
 //Route::get('/',[LeadController::class,'getIndex'])->name('index');
 Route::get('/createLead',\App\Livewire\Leads::class)->name('createLead');
+Route::get('managers', \App\Livewire\ManagersTab::class)->name('managers');
 require __DIR__.'/auth.php';
