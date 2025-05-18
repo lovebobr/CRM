@@ -68,6 +68,10 @@
                                  </span>
 
                         </button>
+                        <button wire:click="showManagerLeads({{ $manager->id }})"
+                                class="text-blue-600 hover:text-blue-800">
+                            Показать заявки
+                        </button>
                     </td>
                 </tr>
             @empty
@@ -77,5 +81,44 @@
             @endforelse
             </tbody>
         </table>
+        @if($selectedManager)
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">
+                    Заявки менеджера: {{ $selectedManager->name }}
+                </h3>
+
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Телефон</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Статус</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Описание</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Дата создания</th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($managerLeads as $lead)
+                        <tr>
+                            <td class="px-6 py-4 text-sm text-gray-900">{{ $lead->phone }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                    <span class="px-2 py-1 text-xs rounded-full"
+                                          style="background-color: {{ $lead->status->color ?? '#e5e7eb' }}">
+                                        {{ $lead->status->name ?? 'Нет статуса' }}
+                                    </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900">{{ $lead->description }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900">{{ $lead->created_at->format('d.m.Y H:i') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                Нет назначенных заявок
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 </div>

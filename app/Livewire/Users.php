@@ -12,15 +12,12 @@ class Users extends Component
 {
     protected array $rules=[
         'name'=>'required',
-        'email'=>'required|email|unique:users,email',
+        'email'=>'required|email:users,email',
     ];
     protected $messages = [
         'name.required'=>'Имя введено не корректно',
         'email.required'=>'Почта введено не корректно',
         'email.email'=>'Почта не корректно введена',
-        'email.unique'=>'Почта должна быть уникальной',
-
-
 
     ];
 
@@ -38,7 +35,6 @@ class Users extends Component
     public function mount()
     {
         $this->availableRoles = Role::all();
-        // ... остальной mount код ...
     }
 
     public function assignRoles($userId)
@@ -61,7 +57,6 @@ class Users extends Component
             return;
         }
 
-        // Обновляем роли (syncRoles принимает массив имён, например ['admin', 'manager'])
         $this->userForRoleAssignment->syncRoles($this->selectedUserRoles);
 
         // Закрываем модальное окно и обновляем данные
@@ -82,12 +77,22 @@ class Users extends Component
     {
         $data=$this->validate();
         $data['email_verified_at']=now();
-        $data['password']='$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
+        $data['password'] = Hash::make('default123');
         $data['remember_token']=Str::random(10);
 
         User::query()->create($data);
-        $this->name="";
-        $this->email="";
+        $this->resetForm();
+    }
+    private function resetForm()
+    {
+        $this->reset([
+            'name', 'email',
+            'userForUpdate', 'selectedUserRoles',
+            'userForRoleAssignment'
+        ]);
+        $this->resetErrorBag();
+        $this->resetValidation();
+        $this->showRoleAssignment = false;
     }
     public function getUpdateUser($id)
     {
@@ -98,10 +103,9 @@ class Users extends Component
     }
     public function updateUser(){
         $data=$this->validate();
-        $this->userForUpdate=User::query()->update($data);
-        $this->name="";
-        $this->email="";
-        $this->userForUpdate=null;
+        $this->userForUpdate->update($data);
+        $this->resetForm();
+
     }
 
     public function render()
