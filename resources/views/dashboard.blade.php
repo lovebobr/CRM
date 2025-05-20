@@ -11,20 +11,22 @@
                 <div class="p-6 text-gray-900">
                     {{ __("Добро пожаловать в систему!") }}
                     @unless(auth()->user()->hasRole('admin'))
-                        <p class="mt-2 text-sm text-gray-500">
-                            Ваш статус: обычный пользователь
-                        </p>
+
                     @endunless
                 </div>
             </div>
             @if(auth()->user()->hasRole('admin'))
-                <!-- Блок управления ролями -->
-                <div class="bg-white shadow sm:rounded-lg">
-                    <div class="px-6 py-4 border-b">
-                        <h3 class="text-lg font-medium text-gray-900">Управление ролями</h3>
-                    </div>
-                    <div class="p-6">
-                        <livewire:role-by-user />
+                <!-- вставить статистику -->
+            @elseif(auth()->user()->hasRole('manager'))
+                <!-- Дашборд менеджера -->
+                <div class="space-y-6">
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-900">Дашборд менеджера</h3>
+                        </div>
+                        <div class="p-6">
+                            <livewire:manager-dashboard />
+                        </div>
                     </div>
                 </div>
             @endif

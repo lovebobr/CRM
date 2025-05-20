@@ -1,5 +1,8 @@
 <div class="space-y-6">
-    <!-- Форма создания/редактирования -->
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-medium text-gray-900">Управление ролями</h3>
+        </div>
     <div class="bg-white p-6 rounded-lg shadow">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             @if($isEditing)
@@ -121,4 +124,5 @@
             </table>
         </div>
     </div>
+</div>
 </div>

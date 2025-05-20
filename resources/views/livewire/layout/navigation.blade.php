@@ -31,19 +31,26 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('createLead')" :active="request()->routeIs('createLead')" wire:navigate>
-                        {{ __('Leads') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
-                        {{ __('Users') }}
+                        {{ __('Заявки') }}
                     </x-nav-link>
                     @if(auth()->user()->hasRole('admin'))
+                    <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
+                        {{ __('Пользователи') }}
+                    </x-nav-link>
+                    @endif
+                    @if(auth()->user()->hasRole('admin'))
                     <x-nav-link :href="route('managers')" :active="request()->routeIs('managers')" wire:navigate>
-                        {{ __('ManagersTab') }}
+                        {{ __('Менеджеры') }}
                     </x-nav-link>
                     @endif
                     @if(auth()->user()->hasRole('admin'))
                         <x-nav-link :href="route('partners')" :active="request()->routeIs('partners')" wire:navigate>
-                            {{ __('Partner') }}
+                            {{ __('Партнеры') }}
+                        </x-nav-link>
+                    @endif
+                    @if(auth()->user()->hasRole('admin'))
+                        <x-nav-link :href="route('role-by-user')" :active="request()->routeIs('role-by-user')" wire:navigate>
+                            {{ __('Управление ролями') }}
                         </x-nav-link>
                     @endif
                 </div>
