@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Partner;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class Partners extends Component
 {
@@ -19,7 +21,7 @@ class Partners extends Component
 
     protected $rules = [
         'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:partners,email',
+        'email' => 'required|email|unique:users,email',
         'company' => 'required|string|max:255',
     ];
 
@@ -33,14 +35,15 @@ class Partners extends Component
 
     public function render()
     {
-        $partners = Partner::withTrashed() // Добавьте withTrashed()
-        ->when($this->searchTerm, function($query) {
-            return $query->where(function($q) {
-                $q->where('name', 'like', '%'.$this->searchTerm.'%')
-                    ->orWhere('email', 'like', '%'.$this->searchTerm.'%')
-                    ->orWhere('company', 'like', '%'.$this->searchTerm.'%');
-            });
-        })
+        $partners = User::role('partner')
+            ->withTrashed()
+            ->when($this->searchTerm, function($query) {
+                return $query->where(function($q) {
+                    $q->where('name', 'like', '%'.$this->searchTerm.'%')
+                        ->orWhere('email', 'like', '%'.$this->searchTerm.'%')
+                        ->orWhere('company', 'like', '%'.$this->searchTerm.'%');
+                });
+            })
             ->orderBy($this->orderBy, $this->orderDirection)
             ->paginate($this->perPage);
 
@@ -51,11 +54,14 @@ class Partners extends Component
     {
         $this->validate();
 
-        Partner::create([
+        $user = User::create([
             'name' => $this->name,
             'email' => $this->email,
             'company' => $this->company,
+            'password' => Hash::make('password'), // Стандартный пароль
         ]);
+
+        $user->assignRole('partner');
 
         $this->resetForm();
         session()->flash('success', 'Партнер успешно создан');
@@ -63,7 +69,7 @@ class Partners extends Component
 
     public function edit($id)
     {
-        $partner = Partner::findOrFail($id);
+        $partner = User::role('partner')->findOrFail($id);
         $this->partnerId = $id;
         $this->name = $partner->name;
         $this->email = $partner->email;
@@ -74,11 +80,11 @@ class Partners extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:partners,email,'.$this->partnerId,
+            'email' => 'required|email|unique:users,email,'.$this->partnerId,
             'company' => 'required|string|max:255',
         ]);
 
-        $partner = Partner::findOrFail($this->partnerId);
+        $partner = User::role('partner')->findOrFail($this->partnerId);
         $partner->update([
             'name' => $this->name,
             'email' => $this->email,
@@ -91,13 +97,13 @@ class Partners extends Component
 
     public function delete($id)
     {
-        Partner::find($id)->delete();
+        User::role('partner')->find($id)->delete();
         session()->flash('success', 'Партнер перемещен в архив');
     }
 
     public function restore($id)
     {
-        Partner::withTrashed()->find($id)->restore();
+        User::role('partner')->withTrashed()->find($id)->restore();
         session()->flash('success', 'Партнер восстановлен');
     }
 

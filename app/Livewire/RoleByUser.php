@@ -13,7 +13,7 @@ class RoleByUser extends Component
     public $selectedPermissions = [];
     public $availablePermissions = [];
     public $editingRoleId = null;
-    public $isEditing = false; // Добавляем отсутствующую переменную
+    public $isEditing = false;
 
     public function mount()
     {
@@ -40,7 +40,7 @@ class RoleByUser extends Component
         $this->editingRoleId = $role->id;
         $this->roleName = $role->name;
         $this->selectedPermissions = $role->permissions->pluck('name')->toArray();
-        $this->isEditing = true; // Устанавливаем флаг редактирования
+        $this->isEditing = true;
     }
 
     public function updateRole()

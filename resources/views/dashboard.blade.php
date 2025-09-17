@@ -16,7 +16,16 @@
                 </div>
             </div>
             @if(auth()->user()->hasRole('admin'))
-                <!-- вставить статистику -->
+                <div class="space-y-6">
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-900">Моя статистика</h3>
+                        </div>
+                        <div class="p-6">
+                            <livewire:manager-stats />
+                        </div>
+                    </div>
+                </div>
             @elseif(auth()->user()->hasRole('manager'))
                 <!-- Дашборд менеджера -->
                 <div class="space-y-6">
@@ -26,6 +35,17 @@
                         </div>
                         <div class="p-6">
                             <livewire:manager-dashboard />
+                        </div>
+                    </div>
+                </div>
+            @elseif(auth()->user()->hasRole('partner'))
+                <div class="space-y-6">
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-900">Панель партнёра</h3>
+                        </div>
+                        <div class="p-6">
+                            <livewire:partner-dashboard />
                         </div>
                     </div>
                 </div>

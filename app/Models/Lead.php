@@ -16,6 +16,7 @@ class Lead extends Model
         'description',
         'manager_id',
         'partner_id',
+        'source',
     ];
 
     public function manager()
@@ -25,7 +26,8 @@ class Lead extends Model
     public function status(){
         return $this->belongsTo(Status::class,'status_id');
     }
-    public function partner(){
-        return $this->belongsTo(Partner::class,'partner_id');
+    public function partner()
+    {
+        return $this->belongsTo(User::class, 'partner_id');
     }
 }

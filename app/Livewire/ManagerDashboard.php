@@ -1,15 +1,14 @@
 <?php
 
-
 namespace App\Livewire;
 
 use App\Models\Lead;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Partner;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class ManagerDashboard extends Component
 {
@@ -37,8 +36,9 @@ class ManagerDashboard extends Component
         'phone' => 'required|string|max:20',
         'description' => 'required|string',
         'status_id' => 'required|exists:statuses,id',
-        'partner_id' => 'nullable|exists:partners,id'
+        'partner_id' => 'nullable|exists:users,id' // Изменили на users.id
     ];
+
     public function render()
     {
         $manager = Auth::user();
@@ -61,7 +61,7 @@ class ManagerDashboard extends Component
             ->paginate($this->perPage);
 
         $statuses = Status::all();
-        $partners = Partner::all();
+        $partners = User::role('partner')->get(); // Получаем пользователей с ролью partner
 
         return view('livewire.manager-dashboard', [
             'manager' => $manager,
@@ -71,6 +71,7 @@ class ManagerDashboard extends Component
             'allPartners' => $partners
         ]);
     }
+
     public function editLead($leadId)
     {
         $lead = Lead::findOrFail($leadId);
@@ -111,7 +112,7 @@ class ManagerDashboard extends Component
     public function assignToPartner()
     {
         $this->validate([
-            'selectedPartnerId' => 'required|exists:partners,id'
+            'selectedPartnerId' => 'required|exists:users,id' // Изменили на users.id
         ]);
 
         $lead = Lead::findOrFail($this->selectedLeadId);

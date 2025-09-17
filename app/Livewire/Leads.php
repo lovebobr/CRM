@@ -11,14 +11,15 @@ class Leads extends Component
 {
     use WithPagination;
 
-    public $phone, $status_id, $description, $manager_id;
+    public $phone, $status_id, $description, $manager_id, $source;
     public $isEditMode = false;
     public $leadForUpdate = null;
     public $perPage = 10;
     public $orderDirection = 'asc';
     public $orderBy = 'created_at';
     public $searchTerm = "";
-
+    public $incomingLeads = [];
+    public $showIncomingLeads = false;
     protected array $messages = [
         'phone.required' => 'Телефон обязателен для заполнения.',
         'phone.string' => 'Телефон должен быть строкой.',
@@ -43,6 +44,7 @@ class Leads extends Component
             'status_id' => 'required|exists:statuses,id',
             'description' => 'nullable|string|max:1000',
             'manager_id' => 'nullable|exists:users,id',
+            'source' => 'nullable|string|max:255',
         ];
     }
 
@@ -54,6 +56,7 @@ class Leads extends Component
         $this->description = $lead->description;
         $this->manager_id = $lead->manager_id;
         $this->leadForUpdate = $lead;
+        $this->source = $lead->source;
     }
 
     public function updateLead()
@@ -72,6 +75,11 @@ class Leads extends Component
     public function storeLead()
     {
         $data = $this->validate();
+
+        if (!isset($data['status_id'])) {
+            $data['status_id'] = Status::getDefaultStatus()->id;
+        }
+
         Lead::create($data);
         $this->resetForm();
     }
@@ -92,20 +100,42 @@ class Leads extends Component
     private function resetForm()
     {
         $this->reset([
-            'phone', 'status_id', 'description', 'manager_id',
+            'phone', 'status_id', 'description', 'manager_id', 'source',
             'leadForUpdate', 'isEditMode'
         ]);
         $this->resetErrorBag();
         $this->resetValidation();
     }
 
+    public function mount()
+    {
+        $this->loadIncomingLeads();
+    }
+
+    public function loadIncomingLeads()
+    {
+        // Получаем последние 10 заявок, созданных через API
+        $this->incomingLeads = Lead::whereNotNull('source')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+    }
+
+    public function toggleIncomingLeads()
+    {
+        $this->showIncomingLeads = !$this->showIncomingLeads;
+        if ($this->showIncomingLeads) {
+            $this->loadIncomingLeads();
+        }
+    }
     public function render()
     {
         $leads = Lead::with(['status', 'manager'])
             ->withTrashed()
             ->when($this->searchTerm, function($query) {
                 $query->where('phone', 'like', '%'.$this->searchTerm.'%')
-                    ->orWhere('description', 'like', '%'.$this->searchTerm.'%');
+                    ->orWhere('description', 'like', '%'.$this->searchTerm.'%')
+                    ->orWhere('source', 'like', '%'.$this->searchTerm.'%');
             })
             ->orderBy($this->orderBy, $this->orderDirection)
             ->paginate($this->perPage);
@@ -121,3 +151,4 @@ class Leads extends Component
         ]);
     }
 }
+

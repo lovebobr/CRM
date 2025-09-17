@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -23,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'company'
     ];
 
     /**
@@ -43,5 +45,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'manager_id');
+    }
+    public function unprocessedLeads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'manager_id')->where('status_id', 1);
+    }
 
+    public function processedLeads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'manager_id')->where('status_id', 2);
+    }
 }

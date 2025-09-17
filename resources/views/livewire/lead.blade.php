@@ -1,4 +1,6 @@
 <div>
+    @can('create leads')
+    <!-- Поиск и фильтры -->
     <form class="max-w-md mt-2 ml-2">
         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Поиск</label>
         <div class="relative">
@@ -7,14 +9,16 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                 </svg>
             </div>
-            <input type="search" wire:model.live="searchTerm" class="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Поиск по телефону или описанию..." required />
+            <input type="search" wire:model.live="searchTerm" class="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Поиск по телефону, описанию или источнику..." required />
         </div>
     </form>
+    @endcan
 
 
-        <div class="container mx-auto py-5 ml-2">
-            <form class="flex flex-wrap gap-4 my-1.5">
-                @can('create leads')
+    <!-- Форма создания/редактирования -->
+    <div class="container mx-auto py-5 ml-2">
+        <form class="flex flex-wrap gap-4 my-1.5">
+            @can('create leads')
                 <div class="flex flex-col">
                     <input type="text" wire:model="phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" placeholder="Телефон">
                     @error('phone') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
@@ -45,48 +49,69 @@
                     @error('manager_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
+                <div class="flex flex-col">
+                    <input type="text" wire:model="source" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" placeholder="Источник">
+                    @error('source') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
                 @if($leadForUpdate)
                     <button type="button" wire:click="updateLead" class="text-white bg-pink-300 hover:bg-pink-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Обновить</button>
                 @else
                     <button type="button" wire:click="storeLead" class="text-white bg-pink-300 hover:bg-pink-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Создать</button>
                 @endif
-                @endcan
-                <div >
-                    <select wire:model.live="perPage" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                    </select>
-                </div>
+            @endcan
 
-                <div >
-                    <select wire:model.live="orderDirection" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
-                        <option value="desc">По убыванию</option>
-                        <option value="asc">По возрастанию</option>
-                    </select>
-                </div>
+            <div>
+                <select wire:model.live="perPage" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
 
-            </form>
-        </div>
+            <div>
+                <select wire:model.live="orderDirection" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
+                    <option value="desc">По убыванию</option>
+                    <option value="asc">По возрастанию</option>
+                </select>
+            </div>
 
+            <div>
+                <select wire:model.live="orderBy" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
+                    <option value="created_at">Дата создания</option>
+                    <option value="phone">Телефон</option>
+                    <option value="source">Источник</option>
+                </select>
+            </div>
+        </form>
+    </div>
 
+    <!-- Основная таблица заявок -->
     <div class="bg-white ml-2">
         <div class="overflow-scroll px-0">
             <table class="w-full min-w-max table-auto text-left">
                 <thead>
                 <tr>
                     <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Телефон</p></th>
+                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Телефон</p>
+                    </th>
                     <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Статус</p></th>
+                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Статус</p>
+                    </th>
                     <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Описание</p></th>
+                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Источник</p>
+                    </th>
                     <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Менеджер</p></th>
+                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Описание</p>
+                    </th>
+                    <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                        <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Менеджер</p>
+                    </th>
                     @canany(['edit leads', 'delete leads', 'restore leads'])
                         <th class="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                            <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Действия</p></th>
+                            <p class="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">Действия</p>
+                        </th>
                     @endcanany
                 </tr>
                 </thead>
@@ -94,24 +119,45 @@
                 @forelse($leads as $lead)
                     <tr>
                         <td class="p-4 border-b border-blue-gray-50">
-                            <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">{{ $lead->phone }}</p></td>
+                            <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">{{ $lead->phone }}</p>
+                        </td>
                         <td class="p-4 border-b border-blue-gray-50">
-                            <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">{{ $lead->status->name }}</p></td>
+                        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
+                            @if($lead->status->name === 'Не обработан') bg-gray-100 text-gray-800
+                            @elseif($lead->status->name === 'Ликвид') bg-green-100 text-green-800
+                            @elseif($lead->status->name === 'Брак') bg-red-100 text-red-800
+
+                            @else bg-purple-100 text-purple-800 @endif">
+                            {{ $lead->status->name }}
+                        </span>
+                        </td>
                         <td class="p-4 border-b border-blue-gray-50">
-                            <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">{{ $lead->description ?? '-' }}</p></td>
+                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
+                                @if($lead->source === 'website') bg-green-100 text-green-800
+                                @elseif($lead->source === 'facebook') bg-blue-100 text-blue-800
+                                @elseif($lead->source === 'instagram') bg-purple-100 text-purple-800
+                                @elseif($lead->source === 'google') bg-red-100 text-red-800
+                                @else bg-gray-100 text-gray-800 @endif">
+                                {{ $lead->source ?? 'Не указан' }}
+                            </span>
+                        </td>
+                        <td class="p-4 border-b border-blue-gray-50">
+                            <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">{{ $lead->description ?? '-' }}</p>
+                        </td>
                         <td class="p-4 border-b border-blue-gray-50">
                             <p class="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
                                 @if($lead->manager)
                                     {{ $lead->manager->name }}
                                 @else
                                     Не назначен
+
                                 @endif
                             </p>
                         </td>
                         @canany(['edit leads', 'delete leads', 'restore leads'])
                             <td class="p-4 border-b border-blue-gray-50">
                                 @if($lead->deleted_at)
-                                    @can('restore leads')
+                                    @can('edit leads')
                                         <button wire:click="restoreLead({{$lead->id}})"
                                                 class="relative align-middle select-none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-900 hover:bg-gray-900/10 active:bg-gray-900/20" type="button">
                                         <span class="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
@@ -141,7 +187,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="p-4 text-center">Нет данных</td>
+                        <td colspan="6" class="p-4 text-center">Нет данных</td>
                     </tr>
                 @endforelse
                 </tbody>

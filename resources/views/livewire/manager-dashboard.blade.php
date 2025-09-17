@@ -100,7 +100,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <select wire:model="partner_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                    <option value="">Не назначен</option> <!-- value="" -->
+                                    <option value="">Не назначен</option>
                                     @foreach($partners as $partner)
                                         <option value="{{ $partner->id }}">{{ $partner->name }}</option>
                                     @endforeach

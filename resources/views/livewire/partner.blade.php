@@ -35,7 +35,7 @@
                         {{ $partnerId ? 'Обновить' : 'Создать' }}
                     </button>
                 </div>
-                <div >
+                <div>
                     <select wire:model.live="perPage" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
                         <option value="5">5</option>
                         <option value="10">10</option>
@@ -43,7 +43,7 @@
                         <option value="20">20</option>
                     </select>
                 </div>
-                <div >
+                <div>
                     <select wire:model.live="orderBy" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
                         <option value="name">По имени</option>
                         <option value="email">По почте</option>
@@ -51,7 +51,7 @@
                         <option value="deleted_at">По дате удаления</option>
                     </select>
                 </div>
-                <div >
+                <div>
                     <select wire:model.live="orderDirection" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-8">
                         <option value="desc">По убыванию</option>
                         <option value="asc">По возрастанию</option>
@@ -60,12 +60,7 @@
             </div>
         </form>
 
-        <!-- Поиск  -->
-        <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="w-full md:w-64">
-                <input wire:model.debounce.300ms="searchTerm" type="text" placeholder="Поиск..." class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
-        </div>
+
 
         <!-- Таблица -->
         <div class="overflow-x-auto">

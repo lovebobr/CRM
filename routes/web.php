@@ -36,5 +36,9 @@ Route::get('/partners', \App\Livewire\Partners::class)->name('partners');
 Route::middleware(['auth', 'role:manager'])->group(function () {
     Route::get('/manager-dashboard', \App\Livewire\ManagerDashboard::class)->name('manager.dashboard');
 });
+Route::middleware(['auth', 'role:partner'])->group(function () {
+    Route::get('/partner-dashboard', \App\Livewire\PartnerDashboard::class)->name('partner.dashboard');
+});
+
 Route::get('/role-by-user', \App\Livewire\RoleByUser::class)->name('role-by-user');
 require __DIR__.'/auth.php';

@@ -30,9 +30,11 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(auth()->user()->hasRole('admin'))
                     <x-nav-link :href="route('createLead')" :active="request()->routeIs('createLead')" wire:navigate>
                         {{ __('Заявки') }}
                     </x-nav-link>
+                    @endif
                     @if(auth()->user()->hasRole('admin'))
                     <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
                         {{ __('Пользователи') }}
@@ -53,6 +55,7 @@ new class extends Component
                             {{ __('Управление ролями') }}
                         </x-nav-link>
                     @endif
+
                 </div>
 {{--                </div>--}}
             </div>
